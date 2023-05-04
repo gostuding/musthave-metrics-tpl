@@ -8,27 +8,19 @@ import (
 	"strings"
 )
 
-type gauge struct {
-	name  string
-	value float64
-}
-
-type counter struct {
-	name  string
-	value int64
-}
-
-type MSWriter interface {
-	AddMetric(string) (int, error)
-	// Print() string
-}
-
+// Структура для хранения данных о метриках
 type MemStorage struct {
-	gauges   []gauge
-	counters []counter
+	// Gauges []gauge
+	// Counters []counter
+	Gauges   map[string]float64
+	Counters map[string]int64
 }
 
+// создание нового объекта MemStorage
 func NewMemStorage() *MemStorage {
+	item := MemStorage{}
+	item.Counters = map[string]int64{"": 0}
+	item.Gauges = map[string]float64{"": 0}
 	return new(MemStorage)
 }
 
@@ -54,39 +46,39 @@ func (ms *MemStorage) AddMetric(path string) (int, error) {
 		}
 		ms.addCounter(items[1], val)
 	} else {
-		fmt.Printf("Metric type incorrect. Type is: %s\n", items[0])
+		fmt.Printf("Metric's type incorrect. Type is: %s\n", items[0])
 		return http.StatusBadRequest, errors.New("metric type incorrect. Availible types are: guage or counter")
 	}
 	return http.StatusOK, nil
 }
 
-func (ms MemStorage) Print() string {
+// Функция для удовлетворения интерфейсу Stringer
+func (ms MemStorage) String() string {
+	index := 1
 	body := "==== MemoryStorage ====\n"
-	for index, value := range ms.gauges {
-		body += fmt.Sprintf("Gauges: %d, name: '%s', value: '%f'\n", index, value.name, value.value)
+	for key, value := range ms.Gauges {
+		body += fmt.Sprintf("Gauges: %d, name: '%s', value: '%f'\n", index, key, value)
+		index += 1
 	}
-	for index, value := range ms.counters {
-		body += fmt.Sprintf("Counter: %d, name: '%s', value: '%d'\n", index, value.name, value.value)
+	index = 1
+	for key, value := range ms.Counters {
+		body += fmt.Sprintf("Counter: %d, name: '%s', value: '%d'\n", index, key, value)
+		index += 1
 	}
+	body += "======================="
 	return body
 }
 
 func (ms *MemStorage) addGauge(name string, value float64) {
-	for index, item := range ms.gauges {
-		if item.name == name {
-			ms.gauges[index].value = value
-			return
-		}
+	if ms.Gauges == nil {
+		ms.Gauges = make(map[string]float64)
 	}
-	ms.gauges = append(ms.gauges, gauge{name: name, value: value})
+	ms.Gauges[name] = value
 }
 
 func (ms *MemStorage) addCounter(name string, value int64) {
-	for index, item := range ms.counters {
-		if item.name == name {
-			ms.counters[index].value += value
-			return
-		}
+	if ms.Counters == nil {
+		ms.Counters = make(map[string]int64)
 	}
-	ms.counters = append(ms.counters, counter{name: name, value: value})
+	ms.Counters[name] += value
 }

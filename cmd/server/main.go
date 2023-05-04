@@ -5,10 +5,12 @@ import (
 	"net/http"
 )
 
-var metricWriter = NewMemStorage()
+// Создаём объект для хранения метрик
+var metricStorage = NewMemStorage()
 
 func main() {
 	myServerMux := http.NewServeMux()
+	myServerMux.HandleFunc("/", pathNotFound)
 	myServerMux.HandleFunc("/update/", update)
 
 	err := http.ListenAndServe(`:8080`, myServerMux)
@@ -17,6 +19,13 @@ func main() {
 	}
 }
 
+// Заглушка для остальных запросов (не /update/...). Возвращает StatusBadGateway для всех запросов
+func pathNotFound(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusBadGateway)
+	fmt.Printf("Bad geteway: '%s', path: '%s'\r\n", request.Method, request.URL.Path)
+}
+
+// Обработка запроса на добавление или изменение метрики
 func update(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
 		// разрешаем только POST-запросы
@@ -25,14 +34,17 @@ func update(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Method not allowed. User POST method instead"))
 		return
 	}
-	// status, err := Memory.Add(request.URL.Path)
-	status, err := metricWriter.AddMetric(request.URL.Path)
-	writer.WriteHeader(status)
+	UpdateMemStorage(metricStorage, request.URL.Path, writer)
+}
+
+// Обновление данных у объекта, который относится к интерфейсу Storager, т.к. используется
+// функция добавления и вывода в консоль (AddMetric и String)
+func UpdateMemStorage(storage Storager, path string, writer http.ResponseWriter) {
+	status, err := storage.AddMetric(path)
+	writer.WriteHeader(status) // запись статуса для возврата
 	if err != nil {
 		fmt.Println(err)
-		// writer.Write([]byte(err.Error()))
 	} else {
-		fmt.Println(metricWriter.Print())
-		// writer.Write([]byte(metricWriter.Print()))
+		fmt.Println(storage) // выводим в консоль изменённый объект memStorage
 	}
 }
