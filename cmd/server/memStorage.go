@@ -10,8 +10,6 @@ import (
 
 // Структура для хранения данных о метриках
 type MemStorage struct {
-	// Gauges []gauge
-	// Counters []counter
 	Gauges   map[string]float64
 	Counters map[string]int64
 }
@@ -31,7 +29,7 @@ func (ms *MemStorage) AddMetric(path string) (int, error) {
 	}
 	if len(items) != 3 {
 		fmt.Printf("Metric parse error. Len not equal to 3. %v\n", items)
-		return http.StatusBadRequest, errors.New("metric parse error. Checks url path and repeat")
+		return http.StatusNotFound, errors.New("metric parse error. Checks url path and repeat")
 	}
 	if items[0] == "gauge" {
 		val, err := strconv.ParseFloat(items[2], 64)

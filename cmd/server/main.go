@@ -21,7 +21,7 @@ func main() {
 
 // Заглушка для остальных запросов (не /update/...). Возвращает StatusBadGateway для всех запросов
 func pathNotFound(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusBadGateway)
+	writer.WriteHeader(http.StatusNotFound)
 	fmt.Printf("Bad geteway: '%s', path: '%s'\r\n", request.Method, request.URL.Path)
 }
 
