@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"errors"
@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// Создаём объект для хранения метрик
+var MemoryStorage = MemStorage{}
+
 // Структура для хранения данных о метриках
 type MemStorage struct {
 	Gauges   map[string]float64
@@ -15,12 +18,9 @@ type MemStorage struct {
 }
 
 // создание нового объекта MemStorage
-func NewMemStorage() *MemStorage {
-	item := MemStorage{}
-	item.Counters = map[string]int64{"": 0}
-	item.Gauges = map[string]float64{"": 0}
-	return new(MemStorage)
-}
+// func NewMemStorage() *MemStorage {
+// 	return new(MemStorage)
+// }
 
 func (ms *MemStorage) AddMetric(path string) (int, error) {
 	items := strings.Split(path, "/")
@@ -79,4 +79,19 @@ func (ms *MemStorage) addCounter(name string, value int64) {
 		ms.Counters = make(map[string]int64)
 	}
 	ms.Counters[name] += value
+}
+
+// Интерфей для установки значений в объект из строки
+type Seter interface {
+	AddMetric(string) (int, error)
+}
+
+type Stringer interface { // уже определён в системе, но всё же
+	String() string
+}
+
+// Интерфейс для определения объекта MemStorage
+type Storager interface {
+	Seter
+	Stringer
 }
