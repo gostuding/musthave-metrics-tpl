@@ -6,37 +6,81 @@ import (
 )
 
 func TestMemStorage_AddMetric(t *testing.T) {
+	type args struct {
+		m_type  string
+		m_name  string
+		m_value string
+	}
+	tests := []struct {
+		name    string
+		path    args
+		want    int
+		wantErr bool
+	}{
+		{name: "Добавление значения метрики Counter", path: args{"counter", "item", "2"}, want: http.StatusOK, wantErr: false},
+		{name: "Неправильный путь", path: args{"", "item", "2"}, want: http.StatusBadRequest, wantErr: true},
+		{name: "Неправильный тип данных", path: args{"gauge", "item", "2ll"}, want: http.StatusBadRequest, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ms := MemStorage{}
+			got, err := ms.Update(tt.path.m_type, tt.path.m_name, tt.path.m_value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Update('%s', '%s', '%s') = %v, want %v", tt.path.m_type, tt.path.m_name, tt.path.m_value, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMemStorage_GetMetric(t *testing.T) {
 	type fields struct {
 		Gauges   map[string]float64
 		Counters map[string]int64
 	}
+
+	var gTest = func() map[string]float64 {
+		v := make(map[string]float64)
+		v["item"] = 0.34
+		return v
+	}
+
+	var cTest = func() map[string]int64 {
+		v := make(map[string]int64)
+		v["item"] = 2
+		return v
+	}
+
 	type args struct {
-		path string
+		m_type string
+		m_name string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		path    string
-		want    int
-		wantErr bool
+		name   string
+		fields fields
+		args   args
+		want   string
+		want1  int
 	}{
-		{name: "Добавление значения метрики Counter", path: "/update/counter/item/1", want: http.StatusOK, wantErr: false},
-		{name: "Неправильный путь", path: "/update/item/1", want: http.StatusNotFound, wantErr: true},
-		{name: "Неправильный тип данных", path: "/update/guage/1/ddd", want: http.StatusBadRequest, wantErr: true},
+		{name: "Получение Gauges ", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "gauge", m_name: "item"}, want: "0.34", want1: http.StatusOK},
+		{name: "Неправильный тип", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "error", m_name: "item"}, want: "", want1: http.StatusNotFound},
+		{name: "Неправильное имя", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "counter", m_name: "none"}, want: "", want1: http.StatusNotFound},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ms := &MemStorage{
+			ms := MemStorage{
 				Gauges:   tt.fields.Gauges,
 				Counters: tt.fields.Counters,
 			}
-			got, err := ms.AddMetric(tt.path)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MemStorage.AddMetric() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got, got1 := ms.GetMetric(tt.args.m_type, tt.args.m_name)
 			if got != tt.want {
-				t.Errorf("MemStorage.AddMetric() = %v, want %v", got, tt.want)
+				t.Errorf("MemStorage.GetMetric() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("MemStorage.GetMetric() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
