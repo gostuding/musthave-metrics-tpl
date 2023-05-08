@@ -18,7 +18,7 @@ func TestMemStorage_AddMetric(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "Добавление значения метрики Counter", path: args{"counter", "item", "2"}, want: http.StatusOK, wantErr: false},
-		{name: "Неправильный путь", path: args{"", "item", "2"}, want: http.StatusNotFound, wantErr: true},
+		{name: "Неправильный путь", path: args{"", "item", "2"}, want: http.StatusBadRequest, wantErr: true},
 		{name: "Неправильный тип данных", path: args{"gauge", "item", "2ll"}, want: http.StatusBadRequest, wantErr: true},
 	}
 	for _, tt := range tests {
