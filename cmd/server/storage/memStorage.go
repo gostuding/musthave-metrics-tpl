@@ -62,7 +62,7 @@ func (ms *MemStorage) Update(m_type string, m_name string, m_value string) (int,
 		ms.addCounter(m_name, val)
 	} else {
 		fmt.Printf("Metric's type incorrect. Type is: %s\n", m_type)
-		return http.StatusNotFound, errors.New("metric type incorrect. Availible types are: guage or counter")
+		return http.StatusBadRequest, errors.New("metric type incorrect. Availible types are: guage or counter")
 	}
 	return http.StatusOK, nil
 }
