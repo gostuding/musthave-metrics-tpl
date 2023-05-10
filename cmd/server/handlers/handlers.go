@@ -24,7 +24,7 @@ func MethosNotAllowed(writer http.ResponseWriter, request *http.Request) {
 // Обработка запроса на добавление или изменение метрики
 func Update(writer http.ResponseWriter, request *http.Request, storage storage.StorageSeter) {
 
-	status, err := storage.Update(chi.URLParam(request, "m_type"), chi.URLParam(request, "m_name"), chi.URLParam(request, "m_value"))
+	status, err := storage.Update(chi.URLParam(request, "mType"), chi.URLParam(request, "mName"), chi.URLParam(request, "mValue"))
 	writer.WriteHeader(status) // запись статуса для возврата
 	if err != nil {
 		fmt.Println(err)
@@ -35,7 +35,7 @@ func Update(writer http.ResponseWriter, request *http.Request, storage storage.S
 
 // Обработка запроса метрики
 func GetMetric(writer http.ResponseWriter, request *http.Request, storage storage.StorageGetter) {
-	value, status := storage.GetMetric(chi.URLParam(request, "m_type"), chi.URLParam(request, "m_name"))
+	value, status := storage.GetMetric(chi.URLParam(request, "mType"), chi.URLParam(request, "mName"))
 	writer.WriteHeader(status)
 	writer.Write([]byte(value))
 }
