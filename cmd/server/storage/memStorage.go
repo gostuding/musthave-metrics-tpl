@@ -117,7 +117,7 @@ func (ms MemStorage) String() string {
 }
 
 // Список всех метрик в html
-func (ms MemStorage) GetMetricsHtml() string {
+func (ms MemStorage) GetMetricsHTML() string {
 	body := "<!doctype html> <html lang='en'> <head> <meta charset='utf-8'> <title>Список метрик</title></head>"
 	body += "<body><header><h1><p>Metrics list</p></h1></header>"
 	index := 1
