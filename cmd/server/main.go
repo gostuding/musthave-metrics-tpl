@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// начало работы
 func main() {
 
 	ip_address := flag.String("a", ":8080", "address and port to run server like address:port")
