@@ -55,8 +55,8 @@ func TestMemStorage_GetMetric(t *testing.T) {
 	}
 
 	type args struct {
-		m_type string
-		m_name string
+		mType string
+		mName string
 	}
 	tests := []struct {
 		name   string
@@ -65,9 +65,9 @@ func TestMemStorage_GetMetric(t *testing.T) {
 		want   string
 		want1  int
 	}{
-		{name: "Получение Gauges ", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "gauge", m_name: "item"}, want: "0.34", want1: http.StatusOK},
-		{name: "Неправильный тип", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "error", m_name: "item"}, want: "", want1: http.StatusNotFound},
-		{name: "Неправильное имя", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{m_type: "counter", m_name: "none"}, want: "", want1: http.StatusNotFound},
+		{name: "Получение Gauges ", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{mType: "gauge", mName: "item"}, want: "0.34", want1: http.StatusOK},
+		{name: "Неправильный тип", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{mType: "error", mName: "item"}, want: "", want1: http.StatusNotFound},
+		{name: "Неправильное имя", fields: fields{Gauges: gTest(), Counters: cTest()}, args: args{mType: "counter", mName: "none"}, want: "", want1: http.StatusNotFound},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestMemStorage_GetMetric(t *testing.T) {
 				Gauges:   tt.fields.Gauges,
 				Counters: tt.fields.Counters,
 			}
-			got, got1 := ms.GetMetric(tt.args.m_type, tt.args.m_name)
+			got, got1 := ms.GetMetric(tt.args.mType, tt.args.mName)
 			if got != tt.want {
 				t.Errorf("MemStorage.GetMetric() got = %v, want %v", got, tt.want)
 			}
