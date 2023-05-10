@@ -18,7 +18,9 @@ type MetricsStorage struct {
 }
 
 func (ms *MetricsStorage) UpdateMetrics() {
+	// считывание переменных их runtimr
 	runtime.ReadMemStats(&ms.Supplier)
+	// определение дополнительных метрик
 	ms.PollCount += 1
 	ms.RandomValue = rand.Float64()
 }
@@ -40,11 +42,12 @@ func (ms MetricsStorage) SendMetrics(address fmt.Stringer) {
 			}
 		}
 	}
-
+	// выборка всех переменных из пакета runtime
 	fields := reflect.VisibleFields(reflect.TypeOf(ms.Supplier))
 	for _, field := range fields {
 		send(address.String(), reflect.ValueOf(ms.Supplier).FieldByName(field.Name).Interface(), field.Name)
 	}
+	// отправка дополнительных параметров
 	send(address.String(), ms.PollCount, "PollCount")
 	send(address.String(), ms.RandomValue, "RandomValue")
 }

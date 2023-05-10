@@ -47,21 +47,21 @@ type MemStorage struct {
 	// Counters counter
 }
 
-func (ms *MemStorage) Update(m_type string, mName string, mValue string) (int, error) {
-	if m_type == "gauge" {
+func (ms *MemStorage) Update(mType string, mName string, mValue string) (int, error) {
+	if mType == "gauge" {
 		val, err := strconv.ParseFloat(mValue, 64)
 		if err != nil {
 			return http.StatusBadRequest, err
 		}
 		ms.addGauge(mName, val)
-	} else if m_type == "counter" {
+	} else if mType == "counter" {
 		val, err := strconv.ParseInt(mValue, 10, 64)
 		if err != nil {
 			return http.StatusBadRequest, err
 		}
 		ms.addCounter(mName, val)
 	} else {
-		fmt.Printf("Metric's type incorrect. Type is: %s\n", m_type)
+		fmt.Printf("Metric's type incorrect. Type is: %s\n", mType)
 		return http.StatusBadRequest, errors.New("metric type incorrect. Availible types are: guage or counter")
 	}
 	return http.StatusOK, nil
