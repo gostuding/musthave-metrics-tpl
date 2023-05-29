@@ -22,10 +22,10 @@ func GetRouter() http.Handler {
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		handlers.GetAllMetrics(w, r, memory)
 	})
-	router.Post("/update/{m_type}/{m_name}/{m_value}", func(w http.ResponseWriter, r *http.Request) {
+	router.Post("/update/{mType}/{mName}/{mValue}", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Update(w, r, &memory)
 	})
-	router.Get("/value/{m_type}/{m_name}", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/value/{mType}/{mName}", func(w http.ResponseWriter, r *http.Request) {
 		handlers.GetMetric(w, r, memory)
 	})
 
