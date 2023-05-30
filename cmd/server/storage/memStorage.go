@@ -47,45 +47,45 @@ type MemStorage struct {
 	// Counters counter
 }
 
-func (ms *MemStorage) Update(m_type string, m_name string, m_value string) (int, error) {
-	if m_type == "gauge" {
-		val, err := strconv.ParseFloat(m_value, 64)
+func (ms *MemStorage) Update(mType string, mName string, mValue string) (int, error) {
+	if mType == "gauge" {
+		val, err := strconv.ParseFloat(mValue, 64)
 		if err != nil {
 			return http.StatusBadRequest, err
 		}
-		ms.addGauge(m_name, val)
-	} else if m_type == "counter" {
-		val, err := strconv.ParseInt(m_value, 10, 64)
+		ms.addGauge(mName, val)
+	} else if mType == "counter" {
+		val, err := strconv.ParseInt(mValue, 10, 64)
 		if err != nil {
 			return http.StatusBadRequest, err
 		}
-		ms.addCounter(m_name, val)
+		ms.addCounter(mName, val)
 	} else {
-		fmt.Printf("Metric's type incorrect. Type is: %s\n", m_type)
+		fmt.Printf("Metric's type incorrect. Type is: %s\n", mType)
 		return http.StatusBadRequest, errors.New("metric type incorrect. Availible types are: guage or counter")
 	}
 	return http.StatusOK, nil
 }
 
 // Получение значения метрики по типу и имени
-func (ms MemStorage) GetMetric(m_type string, m_name string) (string, int) {
+func (ms MemStorage) GetMetric(mType string, mName string) (string, int) {
 
-	if m_type == "gauge" {
+	if mType == "gauge" {
 		for key, val := range ms.Gauges {
-			if key == m_name {
+			if key == mName {
 				return fmt.Sprintf("%v", val), http.StatusOK
 			}
 		}
-		fmt.Printf("Gauge metric not found by name: %s\n", m_name)
-	} else if m_type == "counter" {
+		fmt.Printf("Gauge metric not found by name: %s\n", mName)
+	} else if mType == "counter" {
 		for key, val := range ms.Counters {
-			if key == m_name {
+			if key == mName {
 				return fmt.Sprintf("%v", val), http.StatusOK
 			}
 		}
-		fmt.Printf("Counter metric not found by name: %s\n", m_name)
+		fmt.Printf("Counter metric not found by name: %s\n", mName)
 	} else {
-		fmt.Printf("Get metric's type incorrect: %s\n", m_type)
+		fmt.Printf("Get metric's type incorrect: %s\n", mType)
 		return "", http.StatusNotFound
 	}
 	return "", http.StatusNotFound
@@ -117,7 +117,7 @@ func (ms MemStorage) String() string {
 }
 
 // Список всех метрик в html
-func (ms MemStorage) GetMetricsHtml() string {
+func (ms MemStorage) GetMetricsHTML() string {
 	body := "<!doctype html> <html lang='en'> <head> <meta charset='utf-8'> <title>Список метрик</title></head>"
 	body += "<body><header><h1><p>Metrics list</p></h1></header>"
 	index := 1
